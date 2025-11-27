@@ -4,121 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TimeMark Camera Stamp</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Text:wght@400&family=Roboto+Condensed:wght@300;400&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #1a1a1a;
-            color: white;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #fbbf24;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            display: none;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
+        body { font-family: 'Roboto', sans-serif; background-color: #1a1a1a; color: white; user-select: none; -webkit-user-select: none; }
         .canvas-container {
-            width: 100%;
-            max-height: 80vh;
-            overflow: auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            width: 100%; max-height: 80vh; overflow: auto; display: flex; justify-content: center; align-items: center;
             background-image: linear-gradient(45deg, #2a2a2a 25%, transparent 25%), linear-gradient(-45deg, #2a2a2a 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #2a2a2a 75%), linear-gradient(-45deg, transparent 75%, #2a2a2a 75%);
-            background-size: 20px 20px;
-            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-            border-radius: 8px;
-            border: 2px dashed #4b5563;
+            background-size: 20px 20px; border-radius: 8px; border: 2px dashed #4b5563;
         }
-
-        canvas {
-            max-width: 100%;
-            height: auto;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-        }
-
-        /* Full Screen Preview Mode */
-        #fullScreenPreview {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #000;
-            z-index: 9999;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
+        canvas { max-width: 100%; height: auto; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); }
         
-        #fullScreenImage {
-            max-width: 100%;
-            max-height: 85%;
-            object-fit: contain;
-        }
+        #fullScreenPreview { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
+        #fullScreenImage { max-width: 100%; max-height: 85%; object-fit: contain; }
+        .preview-controls { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: center; gap: 15px; }
 
-        .preview-controls {
-            position: absolute;
-            bottom: 20px;
-            display: flex;
-            gap: 15px;
-            width: 100%;
-            justify-content: center;
-            padding: 0 20px;
-        }
-        
-        /* Custom Range Slider */
-        input[type=range] {
-            -webkit-appearance: none; 
-            background: transparent; 
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 16px;
-            width: 16px;
-            border-radius: 50%;
-            background: #eab308;
-            cursor: pointer;
-            margin-top: -6px; 
-        }
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 4px;
-            cursor: pointer;
-            background: #4b5563;
-            border-radius: 2px;
-        }
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #eab308; cursor: pointer; margin-top: -6px; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #4b5563; border-radius: 2px; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #fbbf24; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="min-h-screen flex flex-col md:flex-row" id="mainApp">
 
     <!-- Sidebar -->
     <div class="w-full md:w-1/3 lg:w-1/4 bg-gray-900 p-6 flex flex-col gap-4 overflow-y-auto border-r border-gray-700 h-screen md:h-auto">
-        <h1 class="text-2xl font-bold text-yellow-400 mb-2 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            TimeMark
-        </h1>
+        <h1 class="text-2xl font-bold text-yellow-400 mb-2 flex items-center gap-2">TimeMark</h1>
         
         <div class="bg-gray-800 p-4 rounded-lg">
             <label class="block text-sm text-gray-400 mb-1">1. Chọn ảnh</label>
@@ -126,104 +41,69 @@
         </div>
 
         <div class="bg-gray-800 p-4 rounded-lg flex flex-col gap-3">
-            <h2 class="text-sm font-semibold text-gray-300 border-b border-gray-700 pb-2">Thông tin hiển thị</h2>
-            
-            <div>
-                <label class="text-xs text-gray-500">Giờ (HH:MM)</label>
-                <input type="time" id="timeInput" class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white focus:outline-none focus:border-yellow-500">
-            </div>
-
+            <h2 class="text-sm font-semibold text-gray-300 border-b border-gray-700 pb-2">Thông tin</h2>
+            <div><label class="text-xs text-gray-500">Giờ</label><input type="time" id="timeInput" class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white"></div>
             <div class="grid grid-cols-2 gap-2">
-                <div>
-                    <label class="text-xs text-gray-500">Ngày</label>
-                    <input type="date" id="dateInput" class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white focus:outline-none focus:border-yellow-500">
-                </div>
-                <div>
-                    <label class="text-xs text-gray-500">Thứ</label>
-                    <input type="text" id="dayInput" value="Thứ Ba" class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white focus:outline-none focus:border-yellow-500">
-                </div>
+                <div><label class="text-xs text-gray-500">Ngày</label><input type="date" id="dateInput" class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white"></div>
+                <div><label class="text-xs text-gray-500">Thứ</label><input type="text" id="dayInput" value="Thứ Ba" class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white"></div>
             </div>
-
-            <div>
-                <label class="text-xs text-gray-500">Địa điểm (Tự động xuống dòng)</label>
-                <textarea id="locationInput" rows="2" class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white focus:outline-none focus:border-yellow-500 resize-none">Tây Thạnh, thành phố Hồ Chí Minh, Việt Nam</textarea>
-            </div>
+            <div><label class="text-xs text-gray-500">Địa điểm</label><textarea id="locationInput" rows="2" class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white resize-none">Tây Thạnh, thành phố Hồ Chí Minh, Việt Nam</textarea></div>
             
-            <!-- [NEW] Thanh trượt điều chỉnh kích thước -->
             <div class="mt-2 pt-2 border-t border-gray-700">
                 <div class="flex justify-between items-center mb-1">
-                    <label class="text-xs text-gray-400">Cỡ chữ bên trái</label>
+                    <label class="text-xs text-gray-400">Cỡ chữ trái</label>
                     <span id="scaleValue" class="text-xs text-yellow-400 font-bold">100%</span>
                 </div>
                 <input type="range" id="scaleInput" min="50" max="150" value="100" class="w-full">
             </div>
-
-            <div class="flex items-center gap-2 mt-2">
-                 <input type="checkbox" id="shadowCheck" checked class="w-4 h-4 text-yellow-500 rounded focus:ring-yellow-500 ring-offset-gray-800 bg-gray-700 border-gray-600">
-                 <label for="shadowCheck" class="text-sm text-gray-300">Đổ bóng chữ</label>
-            </div>
+            <div class="flex items-center gap-2 mt-2"><input type="checkbox" id="shadowCheck" checked class="w-4 h-4 text-yellow-500 rounded bg-gray-700 border-gray-600"><label for="shadowCheck" class="text-sm text-gray-300">Đổ bóng</label></div>
         </div>
 
         <div class="mt-auto pt-4 pb-10 md:pb-0">
             <div id="fontStatus" class="text-xs text-green-400 mb-2 text-center">Đang kiểm tra font...</div>
-            
             <div class="flex flex-col gap-2">
-                <button id="viewBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex justify-center items-center gap-2 disabled:opacity-50">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    Xem ảnh & Chụp màn hình
+                <!-- Nút Lưu (Gọi Java Save) -->
+                <button id="saveBtn" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-3 px-4 rounded-lg transition duration-200 flex justify-center items-center gap-2 disabled:opacity-50">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    Lưu vào Thư viện
                 </button>
-
+                
                 <div class="grid grid-cols-2 gap-2">
-                    <button id="copyBtn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-2 rounded-lg transition duration-200 flex justify-center items-center gap-2 disabled:opacity-50">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
-                        Copy
+                    <!-- Nút Share (Gọi Java Share) -->
+                    <button id="shareBtn" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-2 rounded-lg transition duration-200 flex justify-center items-center gap-2 disabled:opacity-50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                        Chia sẻ
                     </button>
-                    <button id="shareBtn" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-3 px-2 rounded-lg transition duration-200 flex justify-center items-center gap-2 disabled:opacity-50">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                        </svg>
-                        Share
+                    <!-- Nút Preview -->
+                    <button id="viewBtn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-2 rounded-lg transition duration-200 flex justify-center items-center gap-2 disabled:opacity-50">
+                        Xem / Chụp
                     </button>
                 </div>
             </div>
-            
-            <p class="text-[10px] text-gray-500 text-center mt-2">Dùng "Xem ảnh" nếu không lưu được.</p>
         </div>
     </div>
 
-    <!-- Preview Area (Editor) -->
+    <!-- Preview & Editor -->
     <div class="flex-1 bg-black p-4 flex flex-col items-center justify-center relative">
         <div class="canvas-container" id="canvasContainer">
-            <div id="placeholderText" class="text-gray-500 text-center p-10">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <p>Vui lòng chọn ảnh để bắt đầu đóng dấu</p>
-            </div>
+            <div id="placeholderText" class="text-gray-500 text-center p-10"><p>Chọn ảnh để bắt đầu</p></div>
             <canvas id="canvas" style="display: none;"></canvas>
         </div>
         <div class="loader absolute" id="loader"></div>
         <div style="opacity: 0; pointer-events: none; position: absolute; z-index: -1;">
-            <span style="font-family: 'Big Shoulders Text'; font-weight: 400;">Test1</span>
-            <span style="font-family: 'Roboto Condensed'; font-weight: 300;">Test2</span>
-            <span style="font-family: 'Roboto Condensed'; font-weight: 400;">Test3</span>
-            <span style="font-family: 'Roboto'; font-weight: 400;">Test4</span>
+            <span style="font-family: 'Big Shoulders Text'; font-weight: 400;">T1</span>
+            <span style="font-family: 'Roboto Condensed'; font-weight: 300;">T2</span>
+            <span style="font-family: 'Roboto Condensed'; font-weight: 400;">T3</span>
+            <span style="font-family: 'Roboto'; font-weight: 400;">T4</span>
         </div>
     </div>
 
-    <!-- Full Screen View Mode -->
+    <!-- Full Screen View -->
     <div id="fullScreenPreview">
         <p class="text-gray-400 absolute top-4 text-xs animate-pulse">Chạm giữ để Lưu hoặc Chụp màn hình</p>
         <img id="fullScreenImage" src="" alt="Result">
         <div class="preview-controls">
-            <button onclick="closePreview()" class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-6 rounded-full shadow-lg">
-                Đóng
-            </button>
+            <button onclick="closePreview()" class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-6 rounded-full shadow-lg">Đóng</button>
         </div>
     </div>
 
@@ -234,11 +114,10 @@
         const loader = document.getElementById('loader');
         const placeholderText = document.getElementById('placeholderText');
         const fontStatus = document.getElementById('fontStatus');
-
-        // Buttons
-        const viewBtn = document.getElementById('viewBtn');
-        const copyBtn = document.getElementById('copyBtn');
+        
+        const saveBtn = document.getElementById('saveBtn');
         const shareBtn = document.getElementById('shareBtn');
+        const viewBtn = document.getElementById('viewBtn');
         const fullScreenPreview = document.getElementById('fullScreenPreview');
         const fullScreenImage = document.getElementById('fullScreenImage');
 
@@ -247,8 +126,6 @@
         const dayInput = document.getElementById('dayInput');
         const locationInput = document.getElementById('locationInput');
         const shadowCheck = document.getElementById('shadowCheck');
-        
-        // [NEW] Slider Controls
         const scaleInput = document.getElementById('scaleInput');
         const scaleValue = document.getElementById('scaleValue');
 
@@ -257,44 +134,24 @@
 
         function initTime() {
             const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            timeInput.value = `${hours}:${minutes}`;
-
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            dateInput.value = `${year}-${month}-${day}`;
-
+            timeInput.value = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            dateInput.value = now.toISOString().split('T')[0];
             const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
             dayInput.value = days[now.getDay()];
         }
 
         async function ensureFontLoaded() {
             if (fontsReady) return true;
-            fontStatus.textContent = "Đang tải bộ font...";
-            fontStatus.className = "text-xs text-yellow-400 mb-2 text-center";
+            fontStatus.textContent = "Đang tải font...";
             try {
-                const fontList = [
-                    "400 1em 'Big Shoulders Text'",
-                    "300 1em 'Roboto Condensed'", 
-                    "400 1em 'Roboto Condensed'",
-                    "400 1em 'Roboto'"
-                ];
-                const loadPromises = fontList.map(font => document.fonts.load(font));
-                await Promise.all(loadPromises);
+                const fonts = ["400 1em 'Big Shoulders Text'", "300 1em 'Roboto Condensed'", "400 1em 'Roboto Condensed'", "400 1em 'Roboto'"];
+                await Promise.all(fonts.map(f => document.fonts.load(f)));
                 await document.fonts.ready;
-                const allLoaded = fontList.every(font => document.fonts.check(font));
-                if (allLoaded) {
-                    fontsReady = true;
-                    fontStatus.textContent = "Font đã sẵn sàng!";
-                    fontStatus.className = "text-xs text-green-400 mb-2 text-center";
-                    return true;
-                }
-                return true; 
-            } catch (e) {
+                fontsReady = true;
+                fontStatus.textContent = "Font OK!";
+                fontStatus.className = "text-xs text-green-400 mb-2 text-center";
                 return true;
-            }
+            } catch(e) { return true; }
         }
 
         function getLines(ctx, text, maxWidth) {
@@ -304,12 +161,7 @@
             for (var i = 1; i < words.length; i++) {
                 var word = words[i];
                 var width = ctx.measureText(currentLine + " " + word).width;
-                if (width < maxWidth) {
-                    currentLine += " " + word;
-                } else {
-                    lines.push(currentLine);
-                    currentLine = word;
-                }
+                if (width < maxWidth) { currentLine += " " + word; } else { lines.push(currentLine); currentLine = word; }
             }
             lines.push(currentLine);
             return lines;
@@ -317,232 +169,139 @@
 
         function drawCanvas() {
             if (!currentImage) return;
-
             const width = currentImage.width;
             const height = currentImage.height;
-
-            canvas.width = width;
-            canvas.height = height;
-
+            canvas.width = width; canvas.height = height;
             ctx.clearRect(0, 0, width, height);
             ctx.drawImage(currentImage, 0, 0, width, height);
 
-            const baseScale = height / 1000; 
-            
-            // [NEW LOGIC] Xử lý Scale từ thanh trượt
-            // Lấy giá trị phần trăm từ thanh trượt (ví dụ: 100, 110, 90)
+            const baseScale = height / 1000;
             const userScalePercent = parseInt(scaleInput.value) / 100;
-            // Áp dụng vào leftScale gốc (0.607)
-            const leftScale = baseScale * 0.607 * userScalePercent; 
             
+            const leftScale = baseScale * 0.607 * userScalePercent; 
             const rightScale = baseScale * 0.7; 
 
             if (shadowCheck.checked) {
-                ctx.shadowColor = "rgba(0, 0, 0, 0.6)";
-                ctx.shadowBlur = 4 * baseScale * 0.6; 
-                ctx.shadowOffsetX = 2 * baseScale * 0.6;
-                ctx.shadowOffsetY = 2 * baseScale * 0.6;
-            } else {
-                ctx.shadowColor = "transparent";
-            }
+                ctx.shadowColor = "rgba(0, 0, 0, 0.6)"; ctx.shadowBlur = 4 * baseScale; ctx.shadowOffsetX = 2 * baseScale; ctx.shadowOffsetY = 2 * baseScale;
+            } else { ctx.shadowColor = "transparent"; }
 
-            const marginX = 40 * leftScale; 
-            const locationYBase = height - (25 * leftScale); 
-
-            // === ĐỊA ĐIỂM ===
+            // === TRÁI ===
+            const marginX = 40 * leftScale;
+            const locationYBase = height - (25 * leftScale);
             const locationTextRaw = locationInput.value;
             const locFontSize = 41.5 * leftScale;
-            ctx.font = `400 ${locFontSize}px 'Roboto Condensed'`;
-            ctx.fillStyle = "white";
-            
+            ctx.font = `400 ${locFontSize}px 'Roboto Condensed'`; ctx.fillStyle = "white"; ctx.textBaseline = "alphabetic"; ctx.textAlign = "left";
             const maxLocWidth = width - marginX - (width * 0.35);
-            const userLines = locationTextRaw.split('\n');
             let finalLines = [];
-            userLines.forEach(line => {
-                const wrapped = getLines(ctx, line, maxLocWidth);
-                finalLines = finalLines.concat(wrapped);
-            });
-
-            const lineHeight = locFontSize * 1.2; 
+            locationTextRaw.split('\n').forEach(line => finalLines = finalLines.concat(getLines(ctx, line, maxLocWidth)));
+            const lineHeight = locFontSize * 1.2;
             const totalLocHeight = (finalLines.length - 1) * lineHeight;
+            finalLines.reverse().forEach((line, index) => ctx.fillText(line, marginX, locationYBase - (index * lineHeight)));
 
-            finalLines.reverse().forEach((line, index) => {
-                ctx.fillText(line, marginX, locationYBase - (index * lineHeight));
-            });
-            
-            // === GIỜ & NGÀY ===
             const effectiveLocationTop = locationYBase - totalLocHeight;
-            const timeY = effectiveLocationTop - (55 * leftScale); 
-
-            // Giờ
+            const timeY = effectiveLocationTop - (55 * leftScale);
             const timeText = timeInput.value;
-            const timeFontSize = 145 * leftScale * 0.9; 
-            ctx.font = `400 ${timeFontSize}px 'Big Shoulders Text'`; 
-            ctx.fillStyle = "white";
-            ctx.textBaseline = "bottom";
-            ctx.textAlign = "left";
-            const timeMetrics = ctx.measureText(timeText);
-            const timeWidth = timeMetrics.width;
+            const timeFontSize = 145 * leftScale * 0.9;
+            ctx.font = `400 ${timeFontSize}px 'Big Shoulders Text'`; ctx.textBaseline = "bottom";
             ctx.fillText(timeText, marginX, timeY);
 
-            // Vạch kẻ
-            const lineYStart = timeY - (128 * leftScale); 
-            const lineTotalHeight = 105 * leftScale;
+            const lineYStart = timeY - (128 * leftScale); const lineTotalHeight = 105 * leftScale; 
+            const timeWidth = ctx.measureText(timeText).width;
             const lineX = marginX + timeWidth + (20 * leftScale);
-            ctx.beginPath();
-            ctx.moveTo(lineX, lineYStart);
-            ctx.lineTo(lineX, lineYStart + lineTotalHeight);
-            ctx.lineWidth = 4 * leftScale;
-            ctx.strokeStyle = "#fbbf24"; 
-            ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(lineX, lineYStart); ctx.lineTo(lineX, lineYStart + lineTotalHeight); ctx.lineWidth = 4 * leftScale; ctx.strokeStyle = "#fbbf24"; ctx.stroke();
 
-            // Ngày & Thứ
             const dateX = lineX + (20 * leftScale);
             const dateObj = new Date(dateInput.value);
-            const dayStr = dateObj.getDate();
-            const monthStr = dateObj.getMonth() + 1;
-            const yearStr = dateObj.getFullYear();
-            const fullDateText = `${dayStr} Tháng ${monthStr}, ${yearStr}`;
-            const dayOfWeekText = dayInput.value;
-
-            // Ngày
+            const fullDateText = `${dateObj.getDate()} Tháng ${dateObj.getMonth() + 1}, ${dateObj.getFullYear()}`;
             const dateFontSize = 42.8 * leftScale;
             ctx.font = `400 ${dateFontSize}px 'Roboto Condensed'`; 
-            ctx.fillStyle = "white";
             ctx.fillText(fullDateText, dateX, lineYStart + (43 * leftScale));
 
-            // Thứ
             const dayFontSize = 37.7 * leftScale;
             ctx.font = `400 ${dayFontSize}px 'Roboto Condensed'`;
-            ctx.fillText(dayOfWeekText, dateX, lineYStart + (112 * leftScale));
+            ctx.fillText(dayInput.value, dateX, lineYStart + (112 * leftScale));
 
-            // --- GÓC PHẢI ---
+            // === PHẢI ===
             const rightMargin = 40 * rightScale;
-            const bottomYRight = height - (40 * rightScale); 
-
-            // Logo
+            const bottomYRight = height - (40 * rightScale);
             const logoFontSize = 42 * rightScale;
-            ctx.font = `400 ${logoFontSize}px 'Roboto'`;
-            ctx.textBaseline = "bottom";
-            ctx.textAlign = "right";
-            const markText = "mark";
-            const timeLabelText = "Time";
+            ctx.font = `400 ${logoFontSize}px 'Roboto'`; ctx.textBaseline = "bottom"; ctx.textAlign = "right";
             const logoY = bottomYRight - (30 * rightScale);
             const logoX = width - rightMargin;
-
-            ctx.fillStyle = "white";
-            ctx.fillText(markText, logoX, logoY);
-            const markWidth = ctx.measureText(markText).width;
-            ctx.fillStyle = "#fbbf24"; 
-            ctx.fillText(timeLabelText, logoX - markWidth, logoY);
-
-            // Slogan "100% Chân thực"
-            const sloganText = "100% Chân thực";
+            ctx.fillStyle = "white"; ctx.fillText("mark", logoX, logoY);
+            const markWidth = ctx.measureText("mark").width;
+            ctx.fillStyle = "#fbbf24"; ctx.fillText("Time", logoX - markWidth, logoY);
             const sloganFontSize = 24 * rightScale;
-            ctx.font = `400 ${sloganFontSize}px 'Roboto'`;
-            ctx.fillStyle = "white"; 
-            
-            // [ĐIỀU CHỈNH] Dịch slogan sang trái 1 tí xíu (trừ thêm 10 * scale vào toạ độ X)
-            // Vì align là "right", trừ đi sẽ đẩy chữ sang trái
-            ctx.fillText(sloganText, logoX - (10 * rightScale), bottomYRight);
+            ctx.font = `400 ${sloganFontSize}px 'Roboto'`; ctx.fillStyle = "white";
+            ctx.fillText("100% Chân thực", logoX - (10 * rightScale), bottomYRight);
         }
 
-        // --- CÁC HÀM XUẤT FILE & SỰ KIỆN ---
+        // --- LOGIC APP ANDROID ---
+        
+        // 1. Nút Lưu
+        saveBtn.addEventListener('click', async () => {
+            if (!currentImage) return;
+            drawCanvas();
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+
+            if (window.Android && window.Android.saveBase64Image) {
+                window.Android.showToast("Đang lưu vào Thư viện...");
+                window.Android.saveBase64Image(dataUrl);
+            } else {
+                const link = document.createElement('a'); link.download = 'timemark.jpg'; link.href = dataUrl; link.click();
+            }
+        });
+
+        // 2. Nút Share
+        shareBtn.addEventListener('click', async () => {
+            if (!currentImage) return;
+            drawCanvas();
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+
+            // Gọi Java để Share
+            if (window.Android && window.Android.shareBase64Image) {
+                window.Android.showToast("Đang mở chia sẻ...");
+                window.Android.shareBase64Image(dataUrl);
+                return;
+            }
+
+            // Web Share fallback
+            if (navigator.share) {
+                try {
+                    const blob = await (await fetch(dataUrl)).blob();
+                    const file = new File([blob], "timemark.jpg", { type: "image/jpeg" });
+                    await navigator.share({ files: [file], title: 'TimeMark' });
+                } catch (e) { alert("Lỗi: " + e.message); }
+            } else {
+                alert("Không hỗ trợ Share trên trình duyệt này. Hãy dùng nút 'Xem / Chụp'.");
+            }
+        });
 
         viewBtn.addEventListener('click', () => {
             if (!currentImage) return;
             drawCanvas();
-            const dataUrl = canvas.toDataURL('image/jpeg', 1.0);
-            fullScreenImage.src = dataUrl;
+            fullScreenImage.src = canvas.toDataURL('image/jpeg', 1.0);
             fullScreenPreview.style.display = 'flex';
         });
 
-        function closePreview() {
-            fullScreenPreview.style.display = 'none';
-        }
-
-        shareBtn.addEventListener('click', async () => {
-            if (!currentImage) return;
-            drawCanvas();
-            try {
-                const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
-                const blob = await (await fetch(dataUrl)).blob();
-                const file = new File([blob], "timemark.jpg", { type: "image/jpeg" });
-                if (navigator.share) {
-                    await navigator.share({
-                        files: [file],
-                        title: 'TimeMark',
-                        text: 'Ảnh TimeMark'
-                    });
-                } else {
-                    alert("Trình duyệt trong App này không hỗ trợ Share. Hãy dùng nút 'Xem ảnh' để chụp màn hình.");
-                }
-            } catch (e) {
-                alert("Lỗi Share: " + e.message);
-            }
-        });
-
-        copyBtn.addEventListener('click', async () => {
-             if (!currentImage) return;
-             drawCanvas();
-             try {
-                const dataUrl = canvas.toDataURL('image/png'); 
-                const blob = await (await fetch(dataUrl)).blob();
-                await navigator.clipboard.write([
-                    new ClipboardItem({
-                        [blob.type]: blob
-                    })
-                ]);
-                alert("Đã copy ảnh!");
-             } catch (e) {
-                 alert("Không thể Copy trong App này.");
-             }
-        });
-
+        function closePreview() { fullScreenPreview.style.display = 'none'; }
+        scaleInput.addEventListener('input', (e) => { scaleValue.textContent = e.target.value + '%'; drawCanvas(); });
+        
         uploadInput.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            loader.style.display = 'block';
-            placeholderText.style.display = 'none';
+            const file = e.target.files[0]; if (!file) return;
+            loader.style.display = 'block'; placeholderText.style.display = 'none';
             await ensureFontLoaded();
             const reader = new FileReader();
-            reader.onload = (event) => {
-                const img = new Image();
-                img.onload = () => {
-                    currentImage = img;
-                    canvas.style.display = 'block';
-                    drawCanvas();
-                    loader.style.display = 'none';
-                    viewBtn.disabled = false;
-                    copyBtn.disabled = false;
-                    shareBtn.disabled = false;
-                };
-                img.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
+            reader.onload = (ev) => {
+                const img = new Image(); img.onload = () => {
+                    currentImage = img; canvas.style.display = 'block'; drawCanvas();
+                    loader.style.display = 'none'; saveBtn.disabled = false; shareBtn.disabled = false; viewBtn.disabled = false;
+                }; img.src = ev.target.result;
+            }; reader.readAsDataURL(file);
         });
 
-        // [NEW] Event Listener cho Slider
-        scaleInput.addEventListener('input', (e) => {
-            // Cập nhật text hiển thị %
-            scaleValue.textContent = `${e.target.value}%`;
-            // Vẽ lại canvas
-            drawCanvas();
-        });
-
-        [timeInput, dateInput, dayInput, locationInput, shadowCheck].forEach(input => {
-            input.addEventListener('input', drawCanvas);
-        });
-
-        initTime();
-        
-        viewBtn.disabled = true;
-        copyBtn.disabled = true;
-        shareBtn.disabled = true;
-
-        ensureFontLoaded(); 
+        [timeInput, dateInput, dayInput, locationInput, shadowCheck].forEach(i => i.addEventListener('input', drawCanvas));
+        initTime(); saveBtn.disabled = true; shareBtn.disabled = true; viewBtn.disabled = true; ensureFontLoaded();
     </script>
 </body>
 </html>
-
-
